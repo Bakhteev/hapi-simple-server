@@ -10,6 +10,8 @@ import {
 import { handlerError, outputEmpty, outputOk } from '../utils'
 import { IAuthService, authService } from '../services/auth'
 
+
+
 class AuthApi {
   constructor(private readonly service: IAuthService) {}
 
@@ -25,7 +27,7 @@ class AuthApi {
     }
   }
 
-  public login = async (r: Hapi.Request): Promise<IOutputOk<IJwt> | Boom> => {
+  public async login(r: Hapi.Request): Promise<IOutputOk<IJwt> | Boom> {
     const credentials = r.payload as ICredentials
 
     try {
@@ -36,9 +38,7 @@ class AuthApi {
     }
   }
 
-  public tokenRefresh = async (
-    r: Hapi.Request
-  ): Promise<IOutputOk<IJwt> | Boom> => {
+  public async tokenRefresh(r: Hapi.Request): Promise<IOutputOk<IJwt> | Boom> {
     const sessionId = String(r.auth.artifacts['sessionId'])
 
     try {
@@ -50,7 +50,7 @@ class AuthApi {
     }
   }
 
-  public logout = async (r: Hapi.Request): Promise<IOutputEmpty | Boom> => {
+  public async logout(r: Hapi.Request): Promise<IOutputEmpty | Boom> {
     const sessionId = String(r.auth.artifacts['sessionId'])
 
     try {

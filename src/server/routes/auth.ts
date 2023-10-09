@@ -12,12 +12,12 @@ export default <ServerRoute[]>[
   {
     method: 'POST',
     path: '/auth/registration',
-    handler: authApi.signup,
+    handler: async (req) => await authApi.signup(req),
     options: {
       auth: false,
       id: 'auth.registration',
       description: 'Sign up',
-      tags: ['authApi', 'auth'],
+      tags: ['api', 'auth'],
       validate: {
         payload: signupSchema,
       },
@@ -29,12 +29,12 @@ export default <ServerRoute[]>[
   {
     method: 'POST',
     path: '/auth/login',
-    handler: authApi.login,
+    handler: async (req) => await authApi.login(req),
     options: {
       auth: false,
       id: 'auth.login',
       description: 'Login user',
-      tags: ['authApi', 'auth'],
+      tags: ['api', 'auth'],
       validate: {
         payload: credentialsSchema,
       },
@@ -46,11 +46,11 @@ export default <ServerRoute[]>[
   {
     method: 'POST',
     path: '/auth/logout',
-    handler: authApi.logout,
+    handler: async (req) => await authApi.logout(req),
     options: {
       id: 'auth.logout',
       description: 'Logout user',
-      tags: ['authApi', 'auth'],
+      tags: ['api', 'auth'],
       response: {
         schema: outputEmptySchema(),
       },
@@ -59,12 +59,12 @@ export default <ServerRoute[]>[
   {
     method: 'POST',
     path: '/auth/token/refresh',
-    handler: authApi.tokenRefresh,
+    handler: async (req) => await authApi.tokenRefresh(req),
     options: {
       auth: AuthStrategy.JwtRefresh,
       id: 'auth.token.refresh',
       description: 'Use this endpoint to refresh token',
-      tags: ['authApi', 'auth'],
+      tags: ['api', 'auth', 'refresh'],
       response: {
         schema: outputOkSchema(jwtTokensSchema),
       },

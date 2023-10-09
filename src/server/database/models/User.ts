@@ -14,13 +14,18 @@ import { getUUID } from '../../utils'
 import { Session } from './Session'
 import { Wallet } from './Wallet'
 
+export enum UserScope {
+  DEFAULT_SCOPE = 'defaultScope',
+  WITH_PASSWORD = 'withPassword',
+}
+
 @Scopes({
-  defaultScope: {
+  [UserScope.DEFAULT_SCOPE]: {
     attributes: {
       exclude: ['password'],
     },
   },
-  withPassword: {
+  [UserScope.WITH_PASSWORD]: {
     attributes: {
       include: ['password'],
     },

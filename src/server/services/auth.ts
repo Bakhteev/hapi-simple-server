@@ -1,8 +1,4 @@
-import {
-  ICredentials,
-  IJwt,
-  ISignUpCredentials,
-} from '../interfaces'
+import { ICredentials, IJwt, ISignUpCredentials } from '../interfaces'
 import { Errors, ErrorsMessages, Exception } from '../utils'
 import { SessionStatus, UserStatus } from '../enums'
 import { JwtTokenHelper } from '../helpers/JwtTokenHelper'
@@ -18,10 +14,7 @@ class AuthService {
     private readonly sessionRepository: ISessionRepository
   ) {}
 
-  public signup = async ({
-    email,
-    password,
-  }: ISignUpCredentials): Promise<void> => {
+  public async signup({ email, password }: ISignUpCredentials): Promise<void> {
     let user = await this.userRepository.findByEmail(email)
     if (user)
       throw new Exception(
@@ -38,7 +31,7 @@ class AuthService {
     })
   }
 
-  login = async ({ login, password }: ICredentials): Promise<IJwt> => {
+  public async login({ login, password }: ICredentials): Promise<IJwt> {
     const user = await this.userRepository.findByLogin(login, {
       scope: 'withPassword',
     })
@@ -63,18 +56,14 @@ class AuthService {
     return tokens
   }
 
-  tokenRefresh = async (
-    sessionId: string
-  ): Promise<IJwt> => {
+  public async tokenRefresh(sessionId: string): Promise<IJwt> {
     return JwtTokenHelper.generateJwt({
       sessionId,
     })
   }
 
-  public logout = async (sessionId: string): Promise<void> => {
-    const session = await this.sessionRepository.findById(
-      sessionId
-    )
+  public async logout(sessionId: string): Promise<void> {
+    const session = await this.sessionRepository.findById(sessionId)
 
     if (!session)
       throw new Exception(

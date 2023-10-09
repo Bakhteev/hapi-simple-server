@@ -31,7 +31,7 @@ export class Database extends Sequelize {
         acquire: 60000,
         evict: 1000,
       },
-      logging: false,
+      logging: config.development,
     })
   }
 }

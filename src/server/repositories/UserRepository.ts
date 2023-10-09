@@ -1,6 +1,7 @@
-import { Op, Transaction } from 'sequelize'
+import { Op, Transaction, WhereOptions } from 'sequelize'
 import { User } from '../database/models'
 import { UserStatus } from '../enums'
+import { UserScope } from '../database/models/User'
 
 interface IFindByEmailOptions {
   transaction?: Transaction
@@ -17,11 +18,13 @@ interface ICreateOptions {
 
 export interface IUserRepository {
   findAll: (
+    offset?: number,
     limit?: number,
-    offset?: number
+    scope?: UserScope,
+    where?: WhereOptions<User>
   ) => Promise<{
-    rows: User[]
     count: number
+    rows: User[]
   }>
 
   findById: (id: string) => Promise<Omit<User, 'password'> | null>
@@ -45,10 +48,16 @@ export interface IUserRepository {
 }
 
 class UserRepository implements IUserRepository {
-  async findAll(limit = 10, offset = 0) {
-    return await User.findAndCountAll({
+  async findAll(
+    offset = 0,
+    limit = 10,
+    scope = UserScope.DEFAULT_SCOPE,
+    where = {} as WhereOptions<User>
+  ) {
+    return await User.scope(scope).findAndCountAll({
       limit,
       offset,
+      where,
     })
   }
 
