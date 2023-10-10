@@ -1,11 +1,9 @@
-import { User } from '../database/models'
-import { IUserRepository, userRepository } from '../repositories/UserRepository'
-import { Errors, ErrorsMessages, Exception } from '../utils'
+import { IUserRepository } from '../repositories/interfaces/IUserRepository'
 import { Op } from 'sequelize'
-// import { Op } from 'sequelize'
-import { UserScope } from '../database/models/User'
-
-class UserService {
+import { User, UserScope } from '../database/models/User'
+import { UserUpdateDto } from '../dto/userUpdate.dto'
+import { startOfMonth, endOfMonth } from 'date-fns'
+export class UserService {
   constructor(private readonly repository: IUserRepository) {}
 
   async getAll(page: number, limit: number, email?: string) {
@@ -24,21 +22,29 @@ class UserService {
   }
 
   async getById(id: string) {
-    const user = await this.repository.findById(id)
-    if (!user) {
-      throw new Exception(Errors.NotFound, ErrorsMessages[Errors.NotFound], {
-        id,
-      })
-    }
-    return user
+    return await this.repository.findById(id)
   }
 
-  async update(id: string, dto: Pick<User, 'firstName' | 'lastName'>) {
+  async updateUser(id: string, dto: UserUpdateDto) {
     return await this.repository.update(id, dto)
   }
 
-  async getUserRegistrationStatistics() {}
+  async getUserRegistrationStatistics() {
+    const lastMonthStartDate = startOfMonth(new Date())
+    const lastMonthEndDate = endOfMonth(new Date())
+    const count = await User.count<User>({
+      distinct: true,
+      col: 'id',
+      where: {
+        createdAt: { [Op.between]: [lastMonthStartDate, lastMonthEndDate] },
+      },
+    })
+    return {
+      from: lastMonthStartDate,
+      to: lastMonthEndDate,
+      count,
+    }
+  }
 }
 
-export const userService = new UserService(userRepository)
 export type IUserService = UserService

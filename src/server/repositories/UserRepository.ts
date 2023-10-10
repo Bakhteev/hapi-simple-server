@@ -1,51 +1,13 @@
-import { Op, Transaction, WhereOptions } from 'sequelize'
-import { User } from '../database/models'
+import { Op, WhereOptions } from 'sequelize'
+import { User, Wallet } from '../database/models'
 import { UserStatus } from '../enums'
 import { UserScope } from '../database/models/User'
-
-interface IFindByEmailOptions {
-  transaction?: Transaction
-}
-
-interface IFindByLoginOptions {
-  transaction?: Transaction
-  scope?: string
-}
-
-interface ICreateOptions {
-  transaction?: Transaction
-}
-
-export interface IUserRepository {
-  findAll: (
-    offset?: number,
-    limit?: number,
-    scope?: UserScope,
-    where?: WhereOptions<User>
-  ) => Promise<{
-    count: number
-    rows: User[]
-  }>
-
-  findById: (id: string) => Promise<Omit<User, 'password'> | null>
-
-  findByEmail: (
-    email: string,
-    options?: IFindByEmailOptions
-  ) => Promise<User | null>
-
-  findByLogin: (
-    login: string,
-    options: IFindByLoginOptions
-  ) => Promise<User | null>
-
-  create: (
-    values: Partial<User>,
-    options?: ICreateOptions
-  ) => Promise<User | null>
-
-  update: (id: string, dto: Partial<User>) => Promise<void>
-}
+import {
+  ICreateOptions,
+  IFindByEmailOptions,
+  IFindByLoginOptions,
+  IUserRepository,
+} from './interfaces/IUserRepository'
 
 class UserRepository implements IUserRepository {
   async findAll(
@@ -58,6 +20,7 @@ class UserRepository implements IUserRepository {
       limit,
       offset,
       where,
+      include: [Wallet],
     })
   }
 

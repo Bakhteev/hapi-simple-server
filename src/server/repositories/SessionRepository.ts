@@ -1,12 +1,10 @@
 import { Transaction } from 'sequelize'
 import { Session, User } from '../database/models'
 import { SessionStatus, UserStatus } from '../enums'
+import { ISessionRepository } from './interfaces/ISessionRepository'
 
-class SessionRepository {
-  async findActiveSession(
-    sessionId: string,
-    transaction?: Transaction
-  ): Promise<Session | null> {
+class SessionRepository implements ISessionRepository {
+  async findActiveSession(sessionId: string, transaction?: Transaction) {
     return Session.findOne({
       where: {
         id: sessionId,
@@ -27,7 +25,7 @@ class SessionRepository {
 
   async findById(id: string) {
     return await Session.findByPk(id)
-  }	
+  }
 
   async createUserSession(
     userId: string,
@@ -46,4 +44,3 @@ class SessionRepository {
 }
 
 export const sessionRepository = new SessionRepository()
-export type ISessionRepository = SessionRepository

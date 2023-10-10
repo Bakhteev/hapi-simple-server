@@ -1,15 +1,18 @@
 import { Request } from '@hapi/hapi'
-import { userService, IUserService } from '../services/user'
+import { IUserService } from '../services/user'
 import {
   Errors,
   ErrorsMessages,
+  Exception,
   handlerError,
+  outputEmpty,
   outputOk,
   outputPagination,
 } from '../utils'
 import { User } from '../database/models'
+import { UserUpdateDto } from '../dto/userUpdate.dto'
 
-class UserApi {
+export class UserApi {
   constructor(private service: IUserService) {}
 
   public async getAll(
@@ -26,10 +29,42 @@ class UserApi {
 
   public async getById(req: Request<{ Params: { id: string } }>) {
     const { id } = req.params
-
     const user = await this.service.getById(id)
+    if (!user) {
+      const err = new Exception(
+        Errors.NotFound,
+        ErrorsMessages[Errors.NotFound],
+        {
+          id,
+        }
+      )
+      return handlerError(ErrorsMessages[Errors.NotFound], err)
+    }
     return outputOk<Partial<User>>(user)
   }
-}
 
-export const userApi = new UserApi(userService)
+  public async updateUser(
+    req: Request<{ Payload: UserUpdateDto; Params: { id: string } }>
+  ) {
+    const { id } = req.params
+    const user = await this.service.getById(id)
+
+    if (!user) {
+      const err = new Exception(
+        Errors.NotFound,
+        ErrorsMessages[Errors.NotFound],
+        {
+          id,
+        }
+      )
+      return handlerError(ErrorsMessages[Errors.NotFound], err)
+    }
+
+    await this.service.updateUser(id, req.payload)
+    return outputEmpty()
+  }
+
+  public async getUsersRegistrationStatistics() {
+    return this.service.getUserRegistrationStatistics()
+  }
+}

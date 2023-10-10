@@ -14,6 +14,7 @@
     "@hapi/nes": "^12.0.4",
     "@hapi/vision": "^6.1.0",
     "bcrypt": "^5.0.1",
+    "date-fns": "^2.30.0",
     "dotenv": "^10.0.0",
     "hapi-auth-bearer-token": "^6.1.6",
     "hapi-pino": "^6.1.0",

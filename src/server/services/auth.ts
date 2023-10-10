@@ -2,21 +2,20 @@ import { ICredentials, IJwt, ISignUpCredentials } from '../interfaces'
 import { Errors, ErrorsMessages, Exception } from '../utils'
 import { SessionStatus, UserStatus } from '../enums'
 import { JwtTokenHelper } from '../helpers/JwtTokenHelper'
-import { IUserRepository, userRepository } from '../repositories/UserRepository'
-import {
-  ISessionRepository,
-  sessionRepository,
-} from '../repositories/SessionRepository'
+import { IUserRepository } from '../repositories/interfaces/IUserRepository'
+import { ISessionRepository } from '../repositories/interfaces/ISessionRepository'
+import { IWalletRepository } from '../repositories/interfaces/IWalletRepository'
 
-class AuthService {
+export class AuthService {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly sessionRepository: ISessionRepository
+    private readonly sessionRepository: ISessionRepository,
+    private readonly walletRepository: IWalletRepository
   ) {}
 
   public async signup({ email, password }: ISignUpCredentials): Promise<void> {
-    let user = await this.userRepository.findByEmail(email)
-    if (user)
+    const candidate = await this.userRepository.findByEmail(email)
+    if (candidate)
       throw new Exception(
         Errors.UserAlreadyExist,
         ErrorsMessages[Errors.UserAlreadyExist],
@@ -25,10 +24,17 @@ class AuthService {
         }
       )
 
-    user = await this.userRepository.create({
+    const user = await this.userRepository.create({
       email,
       password,
     })
+    if (user) {
+      console.dir(user)
+
+      await this.walletRepository.create(user.id)
+
+      // return handlerError((err as Error).message, err)
+    }
   }
 
   public async login({ login, password }: ICredentials): Promise<IJwt> {
@@ -77,5 +83,4 @@ class AuthService {
   }
 }
 
-export const authService = new AuthService(userRepository, sessionRepository)
 export type IAuthService = AuthService

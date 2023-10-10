@@ -5,12 +5,22 @@ import {
 } from '@hapi/hapi'
 import {
   guidSchema,
+  outputEmptySchema,
   outputOkSchema,
   outputPaginationSchema,
 } from '../schemas/common'
 import { userSchema } from '../schemas/users'
-import { userApi } from '../api/user'
+import { UserApi } from '../api/user'
 import Joi from 'joi'
+import { UserService } from '../services/user'
+import { userRepository } from '../repositories/UserRepository'
+import { pageAbleSchema } from './schemas/userRoute/pageAbleSchema'
+import { emailSearchSchema } from './schemas/userRoute/emailSearchSchema'
+import { UserUpdateDto } from 'server/dto/userUpdate.dto'
+import { UpdateUserSchema } from './schemas/userRoute/updateUserSchema'
+
+const userService = new UserService(userRepository)
+const userApi = new UserApi(userService)
 
 export default <ServerRoute[]>[
   {
@@ -31,31 +41,7 @@ export default <ServerRoute[]>[
       description: 'Get all users',
       tags: ['api', 'users'],
       validate: {
-        query: Joi.object({
-          page: Joi.number()
-            .positive()
-            .optional()
-            .description('Page number')
-            .default(1),
-          limit: Joi.number()
-            .positive()
-            .optional()
-            .description('Page limit')
-            .default(10),
-          email: Joi.string()
-            .optional()
-            .description(
-              `<p>Search by email</p>
-            <p>Valid value</p>
-            <ul>
-              <li>example</li>
-              <li>example@</li>
-              <li>exa</li>
-              <li>example@mail.ru</li>
-            </ul>
-            `
-            ),
-        }),
+        query: pageAbleSchema().concat(emailSearchSchema()),
       },
       response: {
         schema: outputPaginationSchema(userSchema),
@@ -83,8 +69,55 @@ export default <ServerRoute[]>[
         }),
       },
       response: {
+        schema: outputEmptySchema(),
+      },
+    },
+  },
+  {
+    method: 'Patch',
+    path: '/users/update/{id}',
+    handler: async (
+      req: Request<{
+        Params: {
+          id: string
+        }
+        Payload: UserUpdateDto
+      }>
+    ) => await userApi.updateUser(req),
+    options: {
+      auth: false,
+      tags: ['api', 'users'],
+      id: 'users.updateUser',
+      description: 'Update user by id',
+      validate: {
+        params: Joi.object({
+          id: guidSchema,
+        }),
+        payload: UpdateUserSchema,
+      },
+      response: {
         schema: outputOkSchema(userSchema),
       },
+    },
+  },
+  {
+    method: 'GET',
+    path: '/users/statistics',
+    handler: async () => await userApi.getUsersRegistrationStatistics(),
+    options: {
+      auth: false,
+      tags: ['api', 'users'],
+      id: 'users.statistics',
+      description: 'Get users registration statistics over the recent month',
+      // validate: {
+      //   params: Joi.object({
+      //     id: guidSchema,
+      //   }),
+      //   payload: UpdateUserSchema,
+      // },
+      // response: {
+      //   schema: outputOkSchema(userSchema),
+      // },
     },
   },
 ]

@@ -1,4 +1,3 @@
-import { authApi } from '../api/auth'
 import { outputEmptySchema, outputOkSchema } from '../schemas/common'
 import { AuthStrategy } from '../enums'
 import { ServerRoute } from '@hapi/hapi'
@@ -7,6 +6,18 @@ import {
   signupSchema,
   credentialsSchema,
 } from '../schemas/auth'
+import { AuthApi } from '../api/auth'
+import { AuthService } from '../services/auth'
+import { userRepository } from '../repositories/UserRepository'
+import { sessionRepository } from '../repositories/SessionRepository'
+import { walletRepository } from '../repositories/WalletRepository'
+
+const authService = new AuthService(
+  userRepository,
+  sessionRepository,
+  walletRepository
+)
+const authApi = new AuthApi(authService)
 
 export default <ServerRoute[]>[
   {
@@ -64,7 +75,7 @@ export default <ServerRoute[]>[
       auth: AuthStrategy.JwtRefresh,
       id: 'auth.token.refresh',
       description: 'Use this endpoint to refresh token',
-      tags: ['api', 'auth', 'refresh'],
+      tags: ['api', 'auth'],
       response: {
         schema: outputOkSchema(jwtTokensSchema),
       },

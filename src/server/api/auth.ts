@@ -8,21 +8,21 @@ import {
   ISignUpCredentials,
 } from '../interfaces'
 import { handlerError, outputEmpty, outputOk } from '../utils'
-import { IAuthService, authService } from '../services/auth'
+import { IAuthService } from '../services/auth'
 
-
-
-class AuthApi {
+export class AuthApi {
   constructor(private readonly service: IAuthService) {}
 
-  public signup = async (
+  public async signup(
     r: Hapi.Request
-  ): Promise<IOutputEmpty | IOutputOk<{ token?: string }> | Boom> => {
+  ): Promise<IOutputEmpty | IOutputOk<{ token?: string }> | Boom> {
     const credentials = r.payload as ISignUpCredentials
     try {
       await this.service.signup(credentials)
       return outputEmpty()
     } catch (error) {
+      console.log((error as Error).stack)
+
       return handlerError('Failed to sign-up', error)
     }
   }
@@ -61,5 +61,3 @@ class AuthApi {
     }
   }
 }
-
-export const authApi = new AuthApi(authService)

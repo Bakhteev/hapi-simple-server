@@ -5,17 +5,17 @@ import {
   Table,
   BelongsTo,
   ForeignKey,
-  IsUUID,
 } from 'sequelize-typescript'
 import { User } from './User'
+import { getUUID } from '../../utils'
 
 @Table
 export class Wallet extends Model {
-  @IsUUID(4)
   @Column({
     primaryKey: true,
     type: DataType.UUID,
     allowNull: false,
+    defaultValue: () => getUUID(),
   })
   override id!: string
 
