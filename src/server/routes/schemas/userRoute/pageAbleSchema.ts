@@ -12,4 +12,4 @@ export const pageAbleSchema = (page = 1, limit = 10) =>
       .optional()
       .description('Page limit')
       .default(limit),
-  })
+  }).label('Pagination schema')

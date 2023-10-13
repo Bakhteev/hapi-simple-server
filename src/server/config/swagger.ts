@@ -16,7 +16,7 @@ export const swaggerConfig: RegisterOptions = {
       type: 'apiKey',
       name: 'Authorization',
       in: 'header',
-      'x-keyPrefix': 'Bearer ',
+      'Bearer': '',
     },
   },
   security: [

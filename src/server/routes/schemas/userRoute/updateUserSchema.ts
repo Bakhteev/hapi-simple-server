@@ -8,4 +8,4 @@ export const UpdateUserSchema = Joi.object({
   lastName: Joi.string()
     .max(LAST_NAME_MAX_LENGTH)
     .description('Users last name'),
-})
+}).label('Update user schema ')

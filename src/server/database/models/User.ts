@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcrypt'
 import {
+  BelongsToMany,
   Column,
   DataType,
   HasMany,
@@ -13,6 +14,8 @@ import { UserStatus } from '../../enums'
 import { getUUID } from '../../utils'
 import { Session } from './Session'
 import { Wallet } from './Wallet'
+import { Friends } from './Friends'
+// import { Friends } from './Friends'
 
 export enum UserScope {
   DEFAULT_SCOPE = 'defaultScope',
@@ -83,6 +86,9 @@ export class User extends Model {
 
   @HasOne(() => Wallet)
   wallet?: Wallet
+
+  @BelongsToMany(() => User, () => Friends, 'friendId', 'userId')
+  friends?: User[]
 
   public passwordCompare(pwd: string): boolean {
     return bcrypt.compareSync(pwd, this.password)

@@ -8,6 +8,7 @@ import {
   IFindByLoginOptions,
   IUserRepository,
 } from './interfaces/IUserRepository'
+import { Includeable } from 'sequelize'
 
 class UserRepository implements IUserRepository {
   async findAll(
@@ -24,8 +25,8 @@ class UserRepository implements IUserRepository {
     })
   }
 
-  async findById(id: string) {
-    return await User.scope('defaultScope').findByPk(id)
+  async findById(id: string, include: Includeable[] = []) {
+    return await User.scope('defaultScope').findByPk(id, { include })
   }
 
   async findByEmail(
@@ -83,7 +84,16 @@ class UserRepository implements IUserRepository {
   async update(id: string, dto: Partial<User>) {
     const user = await this.findById(id)
     await user?.update(dto)
-    await user?.save()
+    return await user?.save()
+  }
+  async count(column: string, distinct = false, where = {}) {
+    const data = await User.count<User>({
+      col: column,
+      distinct,
+      where,
+      include: [Wallet],
+    })
+    return data
   }
 }
 

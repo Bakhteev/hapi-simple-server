@@ -1,6 +1,7 @@
 import { Transaction, WhereOptions } from 'sequelize/types'
 import { User } from '../../database/models'
 import { UserScope } from '../../database/models/User'
+import { Includeable } from 'sequelize'
 
 export interface IFindByEmailOptions {
   transaction?: Transaction
@@ -26,7 +27,10 @@ export interface IUserRepository {
     rows: User[]
   }>
 
-  findById: (id: string) => Promise<Omit<User, 'password'> | null>
+  findById: (
+    id: string,
+    include?: Includeable[]
+  ) => Promise<Omit<User, 'password'> | null>
 
   findByEmail: (
     email: string,
@@ -43,5 +47,11 @@ export interface IUserRepository {
     options?: ICreateOptions
   ) => Promise<User | null>
 
-  update: (id: string, dto: Partial<User>) => Promise<void>
+  update: (id: string, dto: Partial<User>) => Promise<User | undefined>
+
+  count: (
+    column: string,
+    distinct?: boolean,
+    where?: WhereOptions<User>
+  ) => Promise<number>
 }

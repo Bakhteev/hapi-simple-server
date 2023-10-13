@@ -29,11 +29,7 @@ export class AuthService {
       password,
     })
     if (user) {
-      console.dir(user)
-
       await this.walletRepository.create(user.id)
-
-      // return handlerError((err as Error).message, err)
     }
   }
 

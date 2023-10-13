@@ -15,4 +15,4 @@ export const emailSearchSchema = () =>
             </ul>
             `
       ),
-  })
+  }).label('Email search schema ')
